@@ -24,7 +24,8 @@ class Agent:
         =======
         - action: an integer, compatible with the task's action space
         """
-        return np.random.choice(self.nA)
+        return np.argmax(self.Q[state])
+        #return np.random.choice(self.nA)
 
     def step(self, state, action, reward, next_state, done):
         """ Update the agent's knowledge, using the most recently sampled tuple.
@@ -37,4 +38,27 @@ class Agent:
         - next_state: the current state of the environment
         - done: whether the episode is complete (True or False)
         """
-        self.Q[state][action] += 1
+        '''
+        # SARSA[0]
+        if done:
+            self.Q[state][action] += (reward - self.Q[state][action])
+        else:
+            next_action = self.select_action(state)
+            self.Q[state][action] += (reward + self.Q[next_state][next_action]-self.Q[state][action])
+        '''
+
+        '''
+        # Q -learning
+        if done:
+            Qs_max = 0
+        else:
+            Qs_max = np.max(self.Q[next_state])
+        self.Q[state][action] += (reward + Qs_max - self.Q[state][action])
+        '''
+
+        # Expected SARSA
+        if done:
+            Qs_mean = 0
+        else:
+            Qs_mean = np.mean(self.Q[next_state])
+        self.Q[state][action] += (reward + Qs_mean - self.Q[state][action])
